@@ -64,9 +64,11 @@ const Home = (props) =>{
     const [chatHistoryData,setChatHistoryData] = useState({});
     var cnt =0;
     const [ hideShow, setHideShow] = useState(false);
+    const [ keyId,setKeyId] = useState('');
     //let hideShow = true;
-    const HideAndShow = () =>{
-         setHideShow(!hideShow);
+    const HideAndShow = (k) =>{
+         setHideShow(hideShow => !hideShow);
+         setKeyId(k);
     }
     async function fetchId(){
         try{
@@ -80,7 +82,7 @@ const Home = (props) =>{
         }
        // console.log(usersByDay);
             setGroupById(usersByDay);
-            setSessionList(value.data);
+            //setSessionList(value.data);
         }
         catch(error){
             console.error(error);
@@ -124,7 +126,7 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
         
       useEffect(() => {
         fetchId();
-        chatHistory('6009698071','6009698071-ameyo-1629369064422');
+       // chatHistory('6009698071','6009698071-ameyo-1629369064422');
         }, []);
 
 //console.log(sessionList);
@@ -158,10 +160,16 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                 padding:"10px 0px",
                                 // color:"white"
                             }}
-                             onClick={HideAndShow}>{k}</div>
+                             onClick={() => HideAndShow(k)}>{k}</div>
                             {
-                               (hideShow) ?(groupById[k].map( (item) => {
-                                    return <p>{item.session_id}</p>
+                               (hideShow) && (keyId ===k) ?(groupById[k].map( (item) => {
+                                    return <p 
+                                    style={{
+                                        border:"1px solid yellow",
+                                        padding: "5px"
+                                    }}
+                                    onClick={() => chatHistory(k,item.session_id)}
+                                    >{item.session_id}</p>
                                 })):(<></>)
                             }
                         </UserIdBox>
