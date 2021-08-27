@@ -47,4 +47,9 @@ function ConvertTime(originalDate){
     return(datetypone);
 }
 
+// function DateFormate( originalDate){
+//     from_date = originalDate.format('YYYY-MM-DD')
+//     to_date = end.format('YYYY-MM-DD')
+// }
+
 export default ConvertTime;

@@ -1,6 +1,10 @@
 import axios from "axios";
 import react, {useState, useEffect} from "react";
 import Styled from 'styled-components';
+import { format, addDays } from 'date-fns';
+import { DateRangePicker } from 'react-date-range';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 import ConvertTime from '../utils/sources/Fetched';
 
 const HomeMain = Styled.div`
@@ -52,24 +56,39 @@ border : 1px solid blue;
 
 
 
+
 //var usersByDay={};
 const BaseURL = "https://backend.saarthi.ai";
-const queryUrl = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23";
+ const queryfffUrl = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23";
 //const queryUrl = "https://backend.saarthi.ai/humanHandoff/getUserHistory?userId=6009698071"
 
+var queryUrlBase = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=";
 
 const Home = (props) =>{
     const [sessionList,setSessionList] = useState([]);
     const [groupById , setGroupById] = useState({});
+    // const [filteredData, setFilteredData] = useState({});
+    // const [q, setQ] = useState("");
+
     const [chatHistoryData,setChatHistoryData] = useState({});
     var cnt =0;
     const [ hideShow, setHideShow] = useState(false);
     const [ keyId,setKeyId] = useState('');
-    //let hideShow = true;
+    const [dateState, setDateState] = useState([{
+          startDate: new Date(),
+          endDate: addDays(new Date(), 7),
+          key: 'selection'
+        }]);
+
+
+        let queryUrl ='';
+    const [dateToggle , setDateToggle] = useState(false);
     const HideAndShow = (k) =>{
          setHideShow(hideShow => !hideShow);
          setKeyId(k);
     }
+
+
     async function fetchId(){
         try{
             const value = await axios.get(queryUrl)
@@ -80,22 +99,44 @@ const Home = (props) =>{
             var item = rawData[i];
             (usersByDay[item.user_id] || (usersByDay[item.user_id] = [])).push(item);
         }
-       // console.log(usersByDay);
             setGroupById(usersByDay);
-            //setSessionList(value.data);
+           // setFilteredData(usersByDay);
         }
         catch(error){
             console.error(error);
         }
       }
 
-async function chatHistory(userIdSelected, sessionIdSelected) {
-   //var serviceAddedSessionStorage = []
-        
+    //   useEffect(() => {
+    //     filtered(q);
+    //   }, [q]);
+
+    //   const filtered = (e) => {
+    //     const filtered =
+    //       groupById &&
+    //       Object.keys(groupById).filter((item) => {
+    //         return item.startsWith(e);
+    //       });
+    //     setFilteredData(filtered);
+    //   };
+
+
+ const dateFormater = () => {
+        const from_date = format( new Date(dateState[0].startDate) , 'yyyy-MM-dd');
+        const to_date = format(new Date(dateState[0].endDate), 'yyyy-MM-dd');
+         queryUrl = queryUrlBase +"botid:" + props.botId + "|from_date:" + from_date + "|to_date:" + to_date ;
+        fetchId();
+        console.log(from_date);
+        console.log(to_date);
+        console.log(queryUrl);
+        console.log(queryfffUrl);
+    }
+
+
+
+async function chatHistory(userIdSelected, sessionIdSelected) {     
        const urlParamsHasUserId= userIdSelected!=""
         const urlParamsHasSessionId=sessionIdSelected!=""
-        
-       // console.log(urlParamsHasUserId, urlParamsHasSessionId)
         
         if (urlParamsHasUserId){
         var getUserID=userIdSelected;
@@ -123,7 +164,7 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
         }
  }
 }
-        
+       
       useEffect(() => {
         fetchId();
        // chatHistory('6009698071','6009698071-ameyo-1629369064422');
@@ -134,9 +175,46 @@ const ram = "jai prakash";
 const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
     return(
         <>
-        <div>Chat Area</div>
         <HomeMain>
             <SidebarHome>
+                <div style={{
+                    width: "300px",
+                    //border: "1px solid black"
+                    }}>      
+                       <span style={{
+                           border:"1px dashed red"
+                           }}>
+                        {dateState[0].startDate.toString().substring(0, 15)} - 
+                       {dateState[0].endDate.toString().substring(0, 15)}
+                       </span> <span onClick={ () => setDateToggle(!dateToggle)}
+                       style={{
+                           padding:"0px 10px"
+                       }}>
+                           {
+                               (dateToggle) ? (<button onClick={dateFormater}>Set Date</button>) : (<button>Change Range</button>)
+                           }
+                           </span>
+                       <div style={{
+                                   backgroundColor: "blue"
+                                }}>
+                           {
+                             (dateToggle) && <DateRangePicker
+                             style={{
+                                width:"300px"
+                             }}
+                               onChange={item => setDateState([item.selection])}
+                               showSelectionPreview={false}
+                               //disabled={true}
+                              moveRangeOnFirstSelection={false}
+                               months={2}
+                               //fixedWidth={true}
+                               ranges={dateState}
+                               direction="horizontal"
+                               />
+                           }
+                    
+                    </div>
+                </div>
                 <div>
                 <SearchInput type="text" placeholder="search"/>
                 <div>
@@ -145,12 +223,8 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 </div>
                 </div>
                 <div>
-                </div>
-                {/* onclick={chatHistory(item.user_id ,``)} */}
-                <div>
                     {
                       Object.keys(groupById).map(k => {
-                          //console.log(groupById[k]);
                         return (
                             <>
                         <UserIdBox>
