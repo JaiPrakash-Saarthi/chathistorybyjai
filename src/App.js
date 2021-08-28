@@ -3,6 +3,7 @@ import './App.css';
 import Styled from 'styled-components';
 import Home from './components/Home'
 import { useState } from 'react';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const AppHeader = Styled.div`
   height: 80px;

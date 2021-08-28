@@ -7,28 +7,25 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import ConvertTime from '../utils/sources/Fetched';
 
+
 const HomeMain = Styled.div`
     display: flex;
     flex-wrap : wrap;
 `;
 const SidebarHome = Styled.div`
     padding:10px;
-   // background-color : black;
-    height : 100vh;
     border-right : 1px solid black;
-    flex: 1 1 25%;
+    flex: 1 1 15%;
+    min-width : 300px;
+    //text-align: center;
 `;
 
 const ChatArea = Styled.div`
     flex: 1 1 60%;
     padding: 0 2%;
-    //display:flex;
-    flex-wrap:wrap;
 `;
 const ClientChat = Styled.div`
 text-align: right;
-// background-color: blue;
-// color: white;
 
 `;
 const BotChat = Styled.div`
@@ -39,7 +36,8 @@ const SearchInput = Styled.input`
     width: 90%;
     padding: 7px;
     border-radius: 10px;
-    margin-bottom : 10px;
+    margin-top : 20px;
+    margin-bottom: 5px;
 `;
 const HomeButton = Styled.button`
     padding 5px;
@@ -52,6 +50,13 @@ margin: 5px 0px;
 padding:10px;
 border-radius : 5px;
 border : 1px solid blue;
+`;
+
+const DateAreaSpan = Styled.span`
+    padding: 7px 25px;
+    border-radius: 5px;
+    box-shadow: 5px 5px 20px red inset;
+    color: black;
 `;
 
 
@@ -67,8 +72,8 @@ var queryUrlBase = "http://dashboard.saarthi.ai/Query 62/stream?format=json&toke
 const Home = (props) =>{
     const [sessionList,setSessionList] = useState([]);
     const [groupById , setGroupById] = useState({});
-    // const [filteredData, setFilteredData] = useState({});
-    // const [q, setQ] = useState("");
+    const [filteredData, setFilteredData] = useState({});
+    const [q, setQ] = useState('');
 
     const [chatHistoryData,setChatHistoryData] = useState({});
     var cnt =0;
@@ -92,7 +97,6 @@ const Home = (props) =>{
     async function fetchId(){
         try{
             const value = await axios.get(queryUrl)
-            //console.log(value.data);
             const rawData = value.data;
             const usersByDay = {};
         for (var i = 0; i < rawData.length; i++) {
@@ -100,36 +104,39 @@ const Home = (props) =>{
             (usersByDay[item.user_id] || (usersByDay[item.user_id] = [])).push(item);
         }
             setGroupById(usersByDay);
-           // setFilteredData(usersByDay);
+           setFilteredData(usersByDay);
         }
         catch(error){
             console.error(error);
         }
       }
 
-    //   useEffect(() => {
-    //     filtered(q);
-    //   }, [q]);
+      const filtered = (e) => {
+        const filtered =
+          groupById &&
+          Object.keys(groupById).filter((item) => {
+            return item.startsWith(e);
+          });
+          const jai = groupById;
+           console.log(jai);
+              var filterByUserId = {};
+            for (var i = 0; i < filtered.length; i++) {
+                var itm = filtered[i];
+                (filterByUserId[itm] || (filterByUserId[itm] = [])).push(...groupById[itm]);
+            }         
+          //console.log(filterByUserId);
+        setFilteredData(filterByUserId);
+      };
 
-    //   const filtered = (e) => {
-    //     const filtered =
-    //       groupById &&
-    //       Object.keys(groupById).filter((item) => {
-    //         return item.startsWith(e);
-    //       });
-    //     setFilteredData(filtered);
-    //   };
-
+      useEffect(() => {
+        filtered(q);
+      }, [q]);
 
  const dateFormater = () => {
         const from_date = format( new Date(dateState[0].startDate) , 'yyyy-MM-dd');
         const to_date = format(new Date(dateState[0].endDate), 'yyyy-MM-dd');
          queryUrl = queryUrlBase +"botid:" + props.botId + "|from_date:" + from_date + "|to_date:" + to_date ;
         fetchId();
-        console.log(from_date);
-        console.log(to_date);
-        console.log(queryUrl);
-        console.log(queryfffUrl);
     }
 
 
@@ -177,31 +184,19 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
         <>
         <HomeMain>
             <SidebarHome>
-                <div style={{
-                    width: "300px",
-                    //border: "1px solid black"
-                    }}>      
-                       <span style={{
-                           border:"1px dashed red"
-                           }}>
-                        {dateState[0].startDate.toString().substring(0, 15)} - 
-                       {dateState[0].endDate.toString().substring(0, 15)}
-                       </span> <span onClick={ () => setDateToggle(!dateToggle)}
-                       style={{
-                           padding:"0px 10px"
-                       }}>
+                <div>      
+                       <DateAreaSpan>
+                        {dateState[0].startDate.toString().substring(3, 15)} &nbsp; - &nbsp;
+                       {dateState[0].endDate.toString().substring(3, 15)} &nbsp;&nbsp;
+                       <span onClick={ () => setDateToggle(!dateToggle)}>
                            {
-                               (dateToggle) ? (<button onClick={dateFormater}>Set Date</button>) : (<button>Change Range</button>)
+                               (dateToggle) ? (<i onClick={dateFormater} class="far fa-calendar-check"></i>) : (<i class="fas fa-calendar-alt"></i>)
                            }
-                           </span>
-                       <div style={{
-                                   backgroundColor: "blue"
-                                }}>
+                       </span>
+                       </DateAreaSpan> 
+                       <div>
                            {
                              (dateToggle) && <DateRangePicker
-                             style={{
-                                width:"300px"
-                             }}
                                onChange={item => setDateState([item.selection])}
                                showSelectionPreview={false}
                                //disabled={true}
@@ -216,7 +211,15 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     </div>
                 </div>
                 <div>
-                <SearchInput type="text" placeholder="search"/>
+                <SearchInput 
+                    type="search"
+                    className="form-control rounded"
+                    placeholder="Search"
+                    value={q}
+                    onChange={(e) => {
+                    setQ(e.target.value);
+                    }}
+                />
                 <div>
                 <HomeButton>UserId / Phone-NO</HomeButton>
                 <HomeButton>Session Id</HomeButton>
@@ -224,7 +227,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 </div>
                 <div>
                     {
-                      Object.keys(groupById).map(k => {
+                      Object.keys(filteredData).map(k => {
                         return (
                             <>
                         <UserIdBox>
@@ -236,7 +239,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                             }}
                              onClick={() => HideAndShow(k)}>{k}</div>
                             {
-                               (hideShow) && (keyId ===k) ?(groupById[k].map( (item) => {
+                               (hideShow) && (keyId ===k) ?(filteredData[k].map( (item) => {
                                     return <p 
                                     style={{
                                         border:"1px solid yellow",
