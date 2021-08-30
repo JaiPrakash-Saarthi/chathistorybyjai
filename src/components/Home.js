@@ -39,7 +39,7 @@ font-family: Lato;
 font-size: 14px;
 Padding: 14px;
 margin: 14px;
-border-radius: 5px;
+border-radius: 10px 10px 0 10px;
 box-shadow: 1px 1px 10px #fafafa;
 position: relative;
 left: 50%;
@@ -54,7 +54,7 @@ const BotChat = Styled.div`
     Padding: 14px;
     margin:10px 0px;
     width: 45%;
-    border-radius: 5px;
+    border-radius: 10px 10px 0 10px;
     box-shadow: 1px 1px 10px #fafafa;
 `;
 
@@ -74,8 +74,6 @@ const UserIdBox = Styled.div`
 height : auto;
 margin: 5px 0px;
 border-radius : 5px;
-//height: 100vh;
-//overflow-y: auto;
 `;
 
 const DateAreaSpan = Styled.span`
@@ -90,7 +88,7 @@ const DateAreaSpan = Styled.span`
 
 //var usersByDay={};
 const BaseURL = "https://backend.saarthi.ai";
- const queryfffUrl = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23";
+ //const queryfffUrl = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23";
 //const queryUrl = "https://backend.saarthi.ai/humanHandoff/getUserHistory?userId=6009698071"
 
 var queryUrlBase = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=";
@@ -137,7 +135,6 @@ const Home = (props) =>{
 
 
     const handleClickUser=(key)=>{
-        // console.log("this is working fine");
         if( key === 'user'){
         setTypeShow(true);
         setAclassAdd({
@@ -159,8 +156,6 @@ const Home = (props) =>{
             })
         }
     }
-        
-    // }
 
     const handlePageClick = (e) => {
         const selectedPage = e.selected;
@@ -176,8 +171,6 @@ const Home = (props) =>{
         return newObj;
     }
 
-    //var flagg = true;
-
     async function fetchId(){
         try{
             const res = await axios.get(queryUrl)
@@ -189,7 +182,6 @@ const Home = (props) =>{
         }             
         setGroupById(usersByDay);
         setFilteredData(usersByDay);
-        // setPageCount(Math.ceil(rawData.length / perPage));
         const jai = usersByDay && Object.keys(usersByDay).map( k => {
             return k;
         });
@@ -208,24 +200,22 @@ const Home = (props) =>{
           });
           setPageCount(Math.ceil(filtered.length / perPage));
           const jai = groupById;
-           //console.log(jai);
               var filterByUserId = {};
             for (var i = 0; i < filtered.length; i++) {
                 var itm = filtered[i];
                 (filterByUserId[itm] || (filterByUserId[itm] = [])).push(...groupById[itm]);
             }         
         setFilteredData(filterByUserId);
+        setOffset(0);
       };
 
       useEffect(() => {
         filtered(q);
       }, [q]);
 
- const dateFormater = () => {
-        const from_date = format( new Date(dateState[0].startDate) , 'yyyy-MM-dd');
-        const to_date = format(new Date(dateState[0].endDate), 'yyyy-MM-dd');
-         queryUrl = queryUrlBase +"botid:" + props.botId + "|from_date:" + from_date + "|to_date:" + to_date ;
-        fetchId();
+ const dateFormater = (item) => {
+         setDateState([item.selection]);
+         setDateToggle(!dateToggle);
     }
 
 
@@ -263,9 +253,11 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
 
        
       useEffect(() => {
+        const from_date = format( new Date(dateState[0].startDate) , 'yyyy-MM-dd');
+        const to_date = format(new Date(dateState[0].endDate), 'yyyy-MM-dd');
+        queryUrl = queryUrlBase +"botid:" + props.botId + "|from_date:" + from_date + "|to_date:" + to_date ;
         fetchId();
-       // chatHistory('6009698071','6009698071-ameyo-1629369064422');
-        },[]);
+        },[props.botId, dateState]);
 
 const ram = "jai prakash";
 const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
@@ -279,17 +271,17 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                        <DateAreaSpan>
                         {dateState[0].startDate.toString().substring(3, 15)} &nbsp; - &nbsp;
                        {dateState[0].endDate.toString().substring(3, 15)} &nbsp;&nbsp;
-                       <span onClick={ () => setDateToggle(!dateToggle)}>
-                           {
-                               (dateToggle) ? (<i style={{cursor:"pointer"}} onClick={dateFormater} class="far fa-calendar-check"></i>) : (<i style={{cursor:"pointer"}} class="fas fa-calendar-alt"></i>)
-                           }
-                       </span>
+                           <span onClick={ () => setDateToggle(!dateToggle)}>
+                        {
+                        (!dateToggle) ? (<i style={{cursor:"pointer"}} class="fas fa-calendar-alt"></i>) : (<></>)
+                        }
+                         </span>
                        </DateAreaSpan> 
                        <div style={{backgroundColor:"white", width:"250px"}}>
                            {
                              (dateToggle) && <DateRangePicker
                              style={{backgroundColor:"white", width:"250px", zIndex:"1000"}}
-                               onChange={item => setDateState([item.selection])}
+                               onChange={(item) => dateFormater(item)}
                                showSelectionPreview={false}
                                //disabled={true}
                               moveRangeOnFirstSelection={false}
@@ -435,7 +427,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         backgroundColor:"#0174ff",
                         color:"white",
                         padding:"2px 5px",
-                        borderRadius:"5px",
+                        borderRadius: "10px 10px 0 10px",
                         position:"relative",
                         textAlign:"left",
                         width:"45%",
