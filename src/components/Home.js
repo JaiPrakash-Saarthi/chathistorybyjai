@@ -20,19 +20,42 @@ const SidebarHome = Styled.div`
     border-right : 1px solid black;
     flex: 1 1 15%;
     min-width : 300px;
+    // height: 100vh;
+    // overflow-y: auto;
     //text-align: center;
 `;
 
 const ChatArea = Styled.div`
     flex: 1 1 60%;
     padding: 0 2%;
+    height: 500px;
+    overflow-y: auto;
 `;
 const ClientChat = Styled.div`
 text-align: right;
+background-color: #0174ff !important;
+color: white !important;
+font-family: Lato;
+font-size: 14px;
+Padding: 14px;
+margin: 14px;
+border-radius: 5px;
+box-shadow: 1px 1px 10px #fafafa;
+position: relative;
+left: 50%;
+width: 45%;
+
 
 `;
 const BotChat = Styled.div`
     text-align: left;
+    background-color: #fafafa;
+    font-size: 14px;
+    Padding: 14px;
+    margin:10px 0px;
+    width: 45%;
+    border-radius: 5px;
+    box-shadow: 1px 1px 10px #fafafa;
 `;
 
 const SearchInput = Styled.input`
@@ -50,9 +73,9 @@ const HomeButton = Styled.button`
 const UserIdBox = Styled.div`
 height : auto;
 margin: 5px 0px;
-// padding:10px;
 border-radius : 5px;
-//border : 1px solid blue;
+//height: 100vh;
+//overflow-y: auto;
 `;
 
 const DateAreaSpan = Styled.span`
@@ -166,7 +189,11 @@ const Home = (props) =>{
         }             
         setGroupById(usersByDay);
         setFilteredData(usersByDay);
-        setPageCount(Math.ceil(rawData.length / perPage));
+        // setPageCount(Math.ceil(rawData.length / perPage));
+        const jai = usersByDay && Object.keys(usersByDay).map( k => {
+            return k;
+        });
+        setPageCount(Math.ceil(jai.length / perPage));
         }
         catch(error){
             console.error(error);
@@ -246,7 +273,9 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
         <>
         <HomeMain>
             <SidebarHome>
-                <div>      
+                <div style={{
+
+                }}>      
                        <DateAreaSpan>
                         {dateState[0].startDate.toString().substring(3, 15)} &nbsp; - &nbsp;
                        {dateState[0].endDate.toString().substring(3, 15)} &nbsp;&nbsp;
@@ -256,9 +285,10 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                            }
                        </span>
                        </DateAreaSpan> 
-                       <div style={{backgroundColor:"white"}}>
+                       <div style={{backgroundColor:"white", width:"250px"}}>
                            {
                              (dateToggle) && <DateRangePicker
+                             style={{backgroundColor:"white", width:"250px", zIndex:"1000"}}
                                onChange={item => setDateState([item.selection])}
                                showSelectionPreview={false}
                                //disabled={true}
@@ -289,8 +319,11 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 onClick={() => handleClickUser('session')}>Session Id</HomeButton>
                 </div>
                 </div>
-                <div>
-                    {/* <button onClick={Tens}>click Me</button> */}
+                <div style={{
+                    maxHeight: "350px",
+                    overflowY: "auto"
+                }}>
+                    
                     {
                      (typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
@@ -298,12 +331,10 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         <UserIdBox>
                             <div key={k}
                             style={{
-                                //backgroundColor:"crimson",
                                 backgroundImage: "linear-gradient(red, yellow, green)",
                                 padding:"10px 0px",
                                 borderRadius: "5px",
                                 cursor:"pointer"
-                                // color:"white"
                             }}
                              onClick={() => HideAndShow(k)}>{k}</div>
                             {
@@ -319,16 +350,17 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 })):(<></>)
-                            }
-
-                            
+                            }  
                         </UserIdBox>
                         </>
                         )
                     })
                     }
                 </div>
-                <div>
+                <div style={{
+                    maxHeight: "350px",
+                    overflowY: "auto"
+                }}>
                     {
                      (!typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
@@ -347,9 +379,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 }))
-                            }
-
-                            
+                            }   
                         </UserIdBox>
                         </>
                         )
@@ -386,20 +416,35 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     return(
                         <>
                         <ClientChat key={k}>   
-                        <span>
-                            {text1}
-                            <br></br>
-                            <small>{datetype}</small>
-                        </span>
+                        <div>
+                            <p style={{textAlign:"left"}}>{text1}</p>
+                            <p style={{textAlign:"right", fontSize:"10px"}}>{datetype}</p>
+                        </div>
                         </ClientChat>
                         </>
                     )
                 }
                  if(messageType === 1){
                    const botUtterdRes = chatHistoryData[k].text.data;
+                   const userIntent = chatHistoryData[k].text.nlu_data.intent.name;
+                   const userIntentConf = chatHistoryData[k].text.nlu_data.intent.confidence;
+                   const botCustomStatus = chatHistoryData[k].text.custom.status;
                     return(
                         <>
-                        <BotChat>
+                        <div style={{
+                        backgroundColor:"#0174ff",
+                        color:"white",
+                        padding:"2px 5px",
+                        borderRadius:"5px",
+                        position:"relative",
+                        textAlign:"left",
+                        width:"45%",
+                        left:"50%"
+                        }}>
+                        <p> {userIntent} :{(Math.round(userIntentConf * 100) / 100).toFixed(2)*100}%</p>
+                        <p>Status: {botCustomStatus}</p>
+                        </div>
+                        <div>
                         {
                              Object.keys(botUtterdRes).map( (kk) =>{
                                 var text2 = botUtterdRes[kk].text;
@@ -407,17 +452,15 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                 var j =k+kk;
                                 return(
                                     <>
-                                    <div key={j}>
-                                    {text2}
-                                    <br></br>
-                                    {/* <small>{datetype}</small>
-                                    <p></p> */}
-                                    </div>
+                                    <BotChat key={j}>
+                                        <p style={{textAlign:"left"}}>{text2}</p>
+                                    <p style={{textAlign:"right",fontSize:"10px"}}>{datetype}</p>
+                                    </BotChat>
                                     </>
                                 )
                             })
                         }
-                        </BotChat>
+                        </div>
                         </>
                     )   
                 }   
