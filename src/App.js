@@ -5,6 +5,8 @@ import Home from './components/Home'
 import { useState } from 'react';
 import '@fortawesome/fontawesome-free/css/all.css';
 
+import SaarthiLogo from './assets/saarthi_logo.svg';
+
 const AppHeader = Styled.div`
   height: 80px;
   display: flex;
@@ -36,7 +38,14 @@ function App() {
       <div>
         <div
         style={{
-
+          //height: "44px",
+          color: "#1b1b1b",
+          fontFamily: "Lato",
+          fontSize: "24px",
+          fontWeight: "700",
+          letterSpacing: "0.57px",
+          lineHeight: "28px",
+          padding: "6px 20px",
         }}
         > Chat History </div>
        <span> <strong>&nbsp;&nbsp; Select Bot Id &nbsp;&nbsp;</strong></span> 
@@ -52,7 +61,35 @@ function App() {
       </SelectOption>
       </div>
       <div>
-        <p>Gamut Analytics</p>
+        <span style={{
+          width: "165px",
+          height: "45px",
+          top: "29px",
+          fontFamily: "Lato",
+          fontStyle: "normal",
+          fontWeight: "300",
+          fontSize: "16px",
+          lineHeight: "19px",
+          textAlign: "right",
+          letterSpacing: "0.380952px",
+          color: "#cccccc",
+          padding: "4px",
+        }}
+        id="welcome_saarthi">Welcome</span> 
+        <span style={{
+          height: "45px",
+          top: "29px",
+          fontFamily: "Lato",
+          fontStyle: "normal",
+          fontWeight: "bold",
+          fontSize: "16px",
+          lineHeight: "19px",
+          textAlign: "right",
+          letterSpacing: "0.380952px",
+          color: "#1b1b1b",
+        }} 
+        >Gamut Analytics</span>
+        <span></span>
       </div>
     </AppHeader>
    {/* queryUrl={"http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23"} */}

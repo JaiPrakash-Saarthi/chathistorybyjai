@@ -50,9 +50,9 @@ const HomeButton = Styled.button`
 const UserIdBox = Styled.div`
 height : auto;
 margin: 5px 0px;
-padding:10px;
+// padding:10px;
 border-radius : 5px;
-border : 1px solid blue;
+//border : 1px solid blue;
 `;
 
 const DateAreaSpan = Styled.span`
@@ -84,17 +84,23 @@ const Home = (props) =>{
     const [offset, setOffset] = useState(0);
    // const [data, setData] = useState([]);
     const [perPage] = useState(10);
-    const [pageCount, setPageCount] = useState(0)
+    const [pageCount, setPageCount] = useState(20)
 
     const [chatHistoryData,setChatHistoryData] = useState({});
     var cnt =0;
     const [ hideShow, setHideShow] = useState(false);
     const [ typeShow, setTypeShow] = useState(true);
+    const [ classAdd , setAclassAdd] = useState({
+        bgColorUser :"blue",
+        colorUser : 'white',
+        bgColorSession : "",
+        colorSession : "black"
+    })
 
     const [ keyId,setKeyId] = useState('');
     const [dateState, setDateState] = useState([{
-          startDate: new Date(),
-          endDate: addDays(new Date(), 7),
+          startDate: addDays(new Date(), -7),
+          endDate: new Date(),
           key: 'selection'
         }]);
 
@@ -107,13 +113,35 @@ const Home = (props) =>{
     }
 
 
+    const handleClickUser=(key)=>{
+        // console.log("this is working fine");
+        if( key === 'user'){
+        setTypeShow(true);
+        setAclassAdd({
+            ...classAdd,
+            bgColorUser : "blue",
+            bgColorSession: "",
+            colorSession: "",
+            colorUser: "white"
+        })
+        }
+        else{
+            setTypeShow(false);
+            setAclassAdd({
+                ...classAdd,
+                bgColorUser : "",
+                bgColorSession: "blue",
+                colorSession: "white",
+                colorUser:""
+            })
+        }
+    }
+        
+    // }
 
     const handlePageClick = (e) => {
         const selectedPage = e.selected;
         setOffset(selectedPage * perPage);
-        // console.log("jai prakash");
-        // console.log(selectedPage);
-        // console.log(offset);
     };
 
     function objSlice(obj, offset, lastExclusive) {
@@ -131,21 +159,6 @@ const Home = (props) =>{
         try{
             const res = await axios.get(queryUrl)
             const rawData = res.data;
-            //console.log(rawData);
-            // if(flagg){
-            //     setFinalData(rawData);
-            //     flagg=false;
-            // }       
-            //const finalData = rawData;
-            // console.log(finalData);
-            // console.log("first");
-             //const slice = rawData.slice(offset, offset + perPage)
-             //setFinalData(slice);
-            // console.log("jai prakash");
-            // console.log(slice);
-            // console.log(offset);
-            // var i =offset
-            //  var newObj = objSlice(filteredData, offset, offset + perPage);
             const usersByDay = {};           
         for (var i = 0; i < rawData.length; i++) {
             var item = rawData[i];
@@ -153,15 +166,7 @@ const Home = (props) =>{
         }             
         setGroupById(usersByDay);
         setFilteredData(usersByDay);
-        //var size = Object.keys(us).length;
-        // var size = Object.keys(filteredData).map( (k) =>k);
-        // console.log(size.length);
-
-        //    console.log(filteredData);
-        //    var newObj = objSlice(filteredData, offset, offset + perPage);
-        //    console.log(newObj);
-        //    console.log([newObj]);
-          //  setPageCount(Math.ceil(rawData.length / perPage))
+        setPageCount(Math.ceil(rawData.length / perPage));
         }
         catch(error){
             console.error(error);
@@ -174,6 +179,7 @@ const Home = (props) =>{
           Object.keys(groupById).filter((item) => {
             return item.startsWith(e);
           });
+          setPageCount(Math.ceil(filtered.length / perPage));
           const jai = groupById;
            //console.log(jai);
               var filterByUserId = {};
@@ -181,8 +187,6 @@ const Home = (props) =>{
                 var itm = filtered[i];
                 (filterByUserId[itm] || (filterByUserId[itm] = [])).push(...groupById[itm]);
             }         
-          //console.log(filterByUserId);
-         // setPageCount(Math.ceil(filterByUserId.length / perPage))
         setFilteredData(filterByUserId);
       };
 
@@ -229,37 +233,13 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
         }
  }
 }
+
        
       useEffect(() => {
         fetchId();
        // chatHistory('6009698071','6009698071-ameyo-1629369064422');
         },[]);
 
-    // const tens = () =>{
-    //     var ther = another + 10;
-    //     setAnother( ther);
-    // }
-
-
-    //     const paginatedData = () =>{
-        
-    //        // var size = Object.keys(us).length;
-    //        var size = Object.keys(filteredData).map( (k) =>k);
-    //        console.log(size.length);
-   
-    //         //   console.log(filteredData);
-    //         //   var newObj = objSlice(filteredData, offset, offset + perPage);
-    //         //   console.log(newObj);
-    //         //   console.log([newObj]);
-    //           setPageCount(Math.ceil(size.length / perPage))
-    //    }
-   
-    //    useEffect(() => {
-    //        paginatedData();
-    //       // chatHistory('6009698071','6009698071-ameyo-1629369064422');
-    //        }, [offset]);
-
-//console.log(sessionList);
 const ram = "jai prakash";
 const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
     return(
@@ -272,11 +252,11 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                        {dateState[0].endDate.toString().substring(3, 15)} &nbsp;&nbsp;
                        <span onClick={ () => setDateToggle(!dateToggle)}>
                            {
-                               (dateToggle) ? (<i onClick={dateFormater} class="far fa-calendar-check"></i>) : (<i class="fas fa-calendar-alt"></i>)
+                               (dateToggle) ? (<i style={{cursor:"pointer"}} onClick={dateFormater} class="far fa-calendar-check"></i>) : (<i style={{cursor:"pointer"}} class="fas fa-calendar-alt"></i>)
                            }
                        </span>
                        </DateAreaSpan> 
-                       <div>
+                       <div style={{backgroundColor:"white"}}>
                            {
                              (dateToggle) && <DateRangePicker
                                onChange={item => setDateState([item.selection])}
@@ -303,21 +283,26 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     }}
                 />
                 <div>
-                <HomeButton onClick={() => setTypeShow(true)}>UserId / Phone-NO</HomeButton>
-                <HomeButton onClick={() => setTypeShow(false)}>Session Id</HomeButton>
+                <HomeButton style={{ cursor:"pointer", backgroundColor: classAdd.bgColorUser, color: classAdd.colorUser}} 
+                onClick={() => handleClickUser('user')}> UserId / Phone-NO</HomeButton>
+                <HomeButton style={{ cursor:"pointer", backgroundColor: classAdd.bgColorSession , color: classAdd.colorSession}} 
+                onClick={() => handleClickUser('session')}>Session Id</HomeButton>
                 </div>
                 </div>
                 <div>
                     {/* <button onClick={Tens}>click Me</button> */}
                     {
-                     (typeShow) && Object.keys(filteredData).map(k => {
+                     (typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
                             <>
                         <UserIdBox>
                             <div key={k}
                             style={{
-                                backgroundColor:"crimson",
+                                //backgroundColor:"crimson",
+                                backgroundImage: "linear-gradient(red, yellow, green)",
                                 padding:"10px 0px",
+                                borderRadius: "5px",
+                                cursor:"pointer"
                                 // color:"white"
                             }}
                              onClick={() => HideAndShow(k)}>{k}</div>
@@ -326,7 +311,10 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                     return <p 
                                     style={{
                                         border:"1px solid yellow",
-                                        padding: "5px"
+                                        padding: "5px",
+                                        boxShadow: "5px 5px 20px blue inset",
+                                        borderRadius: "5px",
+                                        cursor:"pointer"
                                     }}
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
@@ -342,24 +330,19 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 </div>
                 <div>
                     {
-                     (!typeShow) && Object.keys(filteredData).map(k => {
+                     (!typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
                             <>
                         <UserIdBox>
-                            {/* <div key={k}
-                            style={{
-                                backgroundColor:"crimson",
-                                padding:"10px 0px",
-                                // color:"white"
-                            }}
-                            (hideShow) && (keyId ===k) ?
-                             onClick={() => HideAndShow(k)}>{k}</div> */}
                             {
                                (filteredData[k].map( (item) => {
                                     return <p 
                                     style={{
                                         border:"1px solid yellow",
-                                        padding: "5px"
+                                        padding: "5px",
+                                        boxShadow: "5px 5px 20px blue inset",
+                                        borderRadius: "5px",
+                                        cursor:"pointer"
                                     }}
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
