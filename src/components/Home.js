@@ -3,9 +3,12 @@ import react, {useState, useEffect} from "react";
 import Styled from 'styled-components';
 import { format, addDays } from 'date-fns';
 import { DateRangePicker } from 'react-date-range';
+import ReactPaginate from 'react-paginate';
+
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import ConvertTime from '../utils/sources/Fetched';
+import '../utils/PaginationCss.css';
 
 
 const HomeMain = Styled.div`
@@ -73,11 +76,21 @@ const Home = (props) =>{
     const [sessionList,setSessionList] = useState([]);
     const [groupById , setGroupById] = useState({});
     const [filteredData, setFilteredData] = useState({});
+   const [finalData, setFinalData] = useState([]);
+   // setFilteredData({...filteredData});
     const [q, setQ] = useState('');
+
+
+    const [offset, setOffset] = useState(0);
+   // const [data, setData] = useState([]);
+    const [perPage] = useState(10);
+    const [pageCount, setPageCount] = useState(0)
 
     const [chatHistoryData,setChatHistoryData] = useState({});
     var cnt =0;
     const [ hideShow, setHideShow] = useState(false);
+    const [ typeShow, setTypeShow] = useState(true);
+
     const [ keyId,setKeyId] = useState('');
     const [dateState, setDateState] = useState([{
           startDate: new Date(),
@@ -94,17 +107,61 @@ const Home = (props) =>{
     }
 
 
+
+    const handlePageClick = (e) => {
+        const selectedPage = e.selected;
+        setOffset(selectedPage * perPage);
+        // console.log("jai prakash");
+        // console.log(selectedPage);
+        // console.log(offset);
+    };
+
+    function objSlice(obj, offset, lastExclusive) {
+        var filteredKeys = Object.keys(obj).slice(offset, lastExclusive);
+        var newObj = {};
+        filteredKeys.forEach(function(key){
+            newObj[obj[key].user_id] = obj[key];
+        });
+        return newObj;
+    }
+
+    //var flagg = true;
+
     async function fetchId(){
         try{
-            const value = await axios.get(queryUrl)
-            const rawData = value.data;
-            const usersByDay = {};
+            const res = await axios.get(queryUrl)
+            const rawData = res.data;
+            //console.log(rawData);
+            // if(flagg){
+            //     setFinalData(rawData);
+            //     flagg=false;
+            // }       
+            //const finalData = rawData;
+            // console.log(finalData);
+            // console.log("first");
+             //const slice = rawData.slice(offset, offset + perPage)
+             //setFinalData(slice);
+            // console.log("jai prakash");
+            // console.log(slice);
+            // console.log(offset);
+            // var i =offset
+            //  var newObj = objSlice(filteredData, offset, offset + perPage);
+            const usersByDay = {};           
         for (var i = 0; i < rawData.length; i++) {
             var item = rawData[i];
             (usersByDay[item.user_id] || (usersByDay[item.user_id] = [])).push(item);
-        }
-            setGroupById(usersByDay);
-           setFilteredData(usersByDay);
+        }             
+        setGroupById(usersByDay);
+        setFilteredData(usersByDay);
+        //var size = Object.keys(us).length;
+        // var size = Object.keys(filteredData).map( (k) =>k);
+        // console.log(size.length);
+
+        //    console.log(filteredData);
+        //    var newObj = objSlice(filteredData, offset, offset + perPage);
+        //    console.log(newObj);
+        //    console.log([newObj]);
+          //  setPageCount(Math.ceil(rawData.length / perPage))
         }
         catch(error){
             console.error(error);
@@ -118,13 +175,14 @@ const Home = (props) =>{
             return item.startsWith(e);
           });
           const jai = groupById;
-           console.log(jai);
+           //console.log(jai);
               var filterByUserId = {};
             for (var i = 0; i < filtered.length; i++) {
                 var itm = filtered[i];
                 (filterByUserId[itm] || (filterByUserId[itm] = [])).push(...groupById[itm]);
             }         
           //console.log(filterByUserId);
+         // setPageCount(Math.ceil(filterByUserId.length / perPage))
         setFilteredData(filterByUserId);
       };
 
@@ -175,7 +233,31 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
       useEffect(() => {
         fetchId();
        // chatHistory('6009698071','6009698071-ameyo-1629369064422');
-        }, []);
+        },[]);
+
+    // const tens = () =>{
+    //     var ther = another + 10;
+    //     setAnother( ther);
+    // }
+
+
+    //     const paginatedData = () =>{
+        
+    //        // var size = Object.keys(us).length;
+    //        var size = Object.keys(filteredData).map( (k) =>k);
+    //        console.log(size.length);
+   
+    //         //   console.log(filteredData);
+    //         //   var newObj = objSlice(filteredData, offset, offset + perPage);
+    //         //   console.log(newObj);
+    //         //   console.log([newObj]);
+    //           setPageCount(Math.ceil(size.length / perPage))
+    //    }
+   
+    //    useEffect(() => {
+    //        paginatedData();
+    //       // chatHistory('6009698071','6009698071-ameyo-1629369064422');
+    //        }, [offset]);
 
 //console.log(sessionList);
 const ram = "jai prakash";
@@ -221,13 +303,14 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     }}
                 />
                 <div>
-                <HomeButton>UserId / Phone-NO</HomeButton>
-                <HomeButton>Session Id</HomeButton>
+                <HomeButton onClick={() => setTypeShow(true)}>UserId / Phone-NO</HomeButton>
+                <HomeButton onClick={() => setTypeShow(false)}>Session Id</HomeButton>
                 </div>
                 </div>
                 <div>
+                    {/* <button onClick={Tens}>click Me</button> */}
                     {
-                      Object.keys(filteredData).map(k => {
+                     (typeShow) && Object.keys(filteredData).map(k => {
                         return (
                             <>
                         <UserIdBox>
@@ -249,12 +332,63 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                     >{item.session_id}</p>
                                 })):(<></>)
                             }
+
+                            
                         </UserIdBox>
                         </>
                         )
                     })
-                    
                     }
+                </div>
+                <div>
+                    {
+                     (!typeShow) && Object.keys(filteredData).map(k => {
+                        return (
+                            <>
+                        <UserIdBox>
+                            {/* <div key={k}
+                            style={{
+                                backgroundColor:"crimson",
+                                padding:"10px 0px",
+                                // color:"white"
+                            }}
+                            (hideShow) && (keyId ===k) ?
+                             onClick={() => HideAndShow(k)}>{k}</div> */}
+                            {
+                               (filteredData[k].map( (item) => {
+                                    return <p 
+                                    style={{
+                                        border:"1px solid yellow",
+                                        padding: "5px"
+                                    }}
+                                    onClick={() => chatHistory(k,item.session_id)}
+                                    >{item.session_id}</p>
+                                }))
+                            }
+
+                            
+                        </UserIdBox>
+                        </>
+                        )
+                    })
+                    }
+                </div>
+                <div style={{
+                    width:"100%",
+                    paddingLeftRight:"0px"
+                }}>
+                <ReactPaginate
+                    previousLabel={"prev"}
+                    nextLabel={"next"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageClick}
+                    containerClassName={"pagination"}
+                    subContainerClassName={"pages pagination"}
+                    activeClassName={"active"}/>
                 </div>
             </SidebarHome>
             <ChatArea>
