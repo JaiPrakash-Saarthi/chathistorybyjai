@@ -11,7 +11,7 @@ const AppHeader = Styled.div`
   height: 80px;
   display: flex;
   justify-content: space-between;
-  border-bottom : 1px solid black;
+ // border-bottom : 1px solid black;
   background-color: #fafafa;
   padding: 10px;
   position: fixed;
@@ -88,15 +88,15 @@ function App() {
       </div>
       <div>
         <span style={{
-          width: "165px",
+          //width: "165px",
           height: "45px",
-          top: "29px",
+          //top: "29px",
           fontFamily: "Lato",
           fontStyle: "normal",
           fontWeight: "300",
           fontSize: "16px",
           lineHeight: "19px",
-          textAlign: "right",
+          //textAlign: "right",
           letterSpacing: "0.380952px",
           color: "#cccccc",
           padding: "4px",
@@ -104,15 +104,16 @@ function App() {
         id="welcome_saarthi">Welcome</span> 
         <span style={{
           height: "45px",
-          top: "29px",
+          //top: "29px",
           fontFamily: "Lato",
           fontStyle: "normal",
           fontWeight: "bold",
           fontSize: "16px",
           lineHeight: "19px",
-          textAlign: "right",
+          //textAlign: "right",
           letterSpacing: "0.380952px",
           color: "#1b1b1b",
+          padding:"7px 27px 0px 7px"
         }} 
         >Gamut Analytics</span>
         <span></span>

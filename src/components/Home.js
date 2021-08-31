@@ -9,6 +9,8 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import ConvertTime from '../utils/sources/Fetched';
 import '../utils/PaginationCss.css';
+import Spinner from '../assets/spinner.gif';
+
 
 
 const HomeMain = Styled.div`
@@ -17,7 +19,7 @@ const HomeMain = Styled.div`
 `;
 const SidebarHome = Styled.div`
     padding:10px;
-    border-right : 1px solid black;
+    //border-right : 1px solid black;
     flex: 1 1 15%;
     min-width : 300px;
     // height: 100vh;
@@ -133,6 +135,9 @@ const Home = (props) =>{
          setKeyId(k);
     }
 
+    const [statusLoading, setStatusLoading] = useState('Loading');
+    const [chatLoading, setChatLoading] = useState('Loading');
+
 
     const handleClickUser=(key)=>{
         if( key === 'user'){
@@ -186,9 +191,18 @@ const Home = (props) =>{
             return k;
         });
         setPageCount(Math.ceil(jai.length / perPage));
+        setStatusLoading('Loaded');
+        if( rawData.length ===0){
+            setStatusLoading('No data found...');
+            setChatLoading('No data found...');
+        }
+        else{
+            chatHistory(rawData[0].user_id, rawData[0].session_id);
+        }
         }
         catch(error){
             console.error(error);
+            setStatusLoading('Error');
         }
       }
 
@@ -220,7 +234,9 @@ const Home = (props) =>{
 
 
 
-async function chatHistory(userIdSelected, sessionIdSelected) {     
+async function chatHistory(userIdSelected, sessionIdSelected) {   
+    //setStatusLoading('Loading');
+    setChatLoading('Loading');  
        const urlParamsHasUserId= userIdSelected!=""
         const urlParamsHasSessionId=sessionIdSelected!=""
         
@@ -243,9 +259,11 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
                 const chatHistorydataa = await axios.get( BaseURL + "/humanHandoff/getUserHistory?" + url_ext);
                  data = chatHistorydataa.data;
                  setChatHistoryData(data);
+                 setChatLoading('Loaded');
             }
             catch(error){
                 console.log(error)
+                setChatLoading('Error');
             }
         }
  }
@@ -256,6 +274,8 @@ async function chatHistory(userIdSelected, sessionIdSelected) {
         const from_date = format( new Date(dateState[0].startDate) , 'yyyy-MM-dd');
         const to_date = format(new Date(dateState[0].endDate), 'yyyy-MM-dd');
         queryUrl = queryUrlBase +"botid:" + props.botId + "|from_date:" + from_date + "|to_date:" + to_date ;
+        setStatusLoading('Loading');
+        setChatLoading('Loading');
         fetchId();
         },[props.botId, dateState]);
 
@@ -317,7 +337,8 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 }}>
                     
                     {
-                     (typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
+                        (statusLoading === 'Loaded') &&
+                     (typeShow) &&  Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
                             <>
                         <UserIdBox>
@@ -347,7 +368,19 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         </>
                         )
                     })
-                    }
+                }
+                {
+                     (statusLoading === 'Loading')&&
+                     <p> <img style={{width:"50px"}} src={Spinner}/> Hang on..... Data is being..... </p>
+                }
+                {
+                    (statusLoading === 'Error') &&
+                    (<p>Please check your botId or date</p>)
+                }
+                {
+                    (statusLoading === 'No data found...') &&
+                    (<p>No data found....</p>)
+                }
                 </div>
                 <div style={{
                     maxHeight: "350px",
@@ -371,7 +404,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 }))
-                            }   
+                            }
                         </UserIdBox>
                         </>
                         )
@@ -398,7 +431,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
             </SidebarHome>
             <ChatArea>
         {
-            Object.keys(chatHistoryData).map( (k) =>{
+           (chatLoading === 'Loaded') && Object.keys(chatHistoryData).map( (k) =>{
                 const messageType = chatHistoryData[k].msg_type;
                 var datetype = new Date(chatHistoryData[k].created_at) || "";
               
@@ -458,6 +491,18 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 }   
             })
          }
+         {
+        (chatLoading === 'Loading')&&
+         <p> <img style={{width:"50px"}} src={Spinner}/> Hang on..... Data is being..... </p>
+        }
+        {
+            (chatLoading === 'Error') &&
+            (<p>Please check your botId or date</p>)
+        } 
+        {
+            (chatLoading === 'No data found...') &&
+            (<p>No data found....</p>)
+        }
             </ChatArea>
         </HomeMain>
         </>
