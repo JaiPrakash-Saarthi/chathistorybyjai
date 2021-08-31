@@ -39,7 +39,7 @@ background-color: #0174ff !important;
 color: white !important;
 font-family: Lato;
 font-size: 14px;
-Padding: 14px;
+Padding: 7px;
 margin: 14px;
 border-radius: 10px 10px 0 10px;
 box-shadow: 1px 1px 10px #fafafa;
@@ -53,7 +53,7 @@ const BotChat = Styled.div`
     text-align: left;
     background-color: #fafafa;
     font-size: 14px;
-    Padding: 14px;
+    Padding: 7px;
     margin:10px 0px;
     width: 45%;
     border-radius: 10px 10px 0 10px;
@@ -496,8 +496,8 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
          <p> <img style={{width:"50px"}} src={Spinner}/> Hang on..... Data is being..... </p>
         }
         {
-            (chatLoading === 'Error') &&
-            (<p>Please check your botId or date</p>)
+            (chatLoading === 'Error' || statusLoading ==='Error') &&
+            (<p>Please check your botId or date... Some error has occured</p>)
         } 
         {
             (chatLoading === 'No data found...') &&

@@ -50,10 +50,11 @@ function App() {
           fontSize: "24px",
           fontWeight: "700",
           letterSpacing: "0.57px",
-          lineHeight: "28px",
-          padding: "6px 20px",
+          //lineHeight: "28px",
         }}
-        > Chat History </div>
+        ><span><img 
+        style={{width: "40px"}}
+        src={SaarthiLogo}/></span><span style={{position:"absolute", top:"20px", paddingLeft:"10px"}}> Chat History </span></div>
        <span> <strong>&nbsp;&nbsp; Select Bot Id &nbsp;&nbsp;</strong></span> 
       <SelectOption id="selectBotId" onChange={SelectBotId}>
       <option value="">1</option>
@@ -116,10 +117,8 @@ function App() {
           padding:"7px 27px 0px 7px"
         }} 
         >Gamut Analytics</span>
-        <span></span>
       </div>
     </AppHeader>
-   {/* queryUrl={"http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=botid:55|from_date:2021-08-17|to_date:2021-08-23"} */}
     <div className="App" style={{
       position: 'relative',
       top:"100px",
