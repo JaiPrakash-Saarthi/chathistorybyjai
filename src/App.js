@@ -11,8 +11,6 @@ const AppHeader = Styled.div`
   height: 80px;
   display: flex;
   justify-content: space-between;
- // border-bottom : 1px solid black;
-  background-color: #fafafa;
   padding: 10px;
   position: fixed;
   width: 100%;

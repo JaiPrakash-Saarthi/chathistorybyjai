@@ -1,12 +1,12 @@
 .pagination {
-    margin: 15px auto;
+    margin: 10px auto;
     display: flex;
     list-style: none;
     outline: none;
   }
   .pagination > .active > a{
     background-color: #47ccde ;
-    border-color: #47ccde ;
+    /* border-color: #47ccde ; */
     color: #fff;
   }
   .pagination > li > a{
@@ -26,3 +26,59 @@
   .pagination > li:first-child > a, .pagination > li:first-child > span, .pagination > li:last-child > a, .pagination > li:last-child > span{
     border-radius: unset
   }
+
+
+.seleU{
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background-color: #3485e9 !important;
+    color: #ffffff;
+    }
+  
+.scrollbar{
+      max-height: 350px; 
+    overflow-y: hidden;
+}
+.scrollbar:hover{
+  overflow-y: auto;
+}
+
+.userIdArea{
+    margin-bottom: 10px;
+    transition: 0.3s;
+    padding: 14px 0px;
+    width: 100%;
+    border-radius: 7px;
+    background-color: #ffffff;
+    color: #1b1b1b;
+    box-shadow: 1px 7px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+/* .userIdArea:hover{
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background-color: #78acec;
+  color: #ffffff;
+} */
+
+.sessionIdArea{
+  margin-bottom: 10px;
+  transition: 0.3s;
+  padding: 7px 0px;
+  width: 100%;
+  border-radius: 7px;
+  background-color: #ffffff;
+  color: #1b1b1b;
+  box-shadow: 1px 7px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+/* .sessionIdArea:hover{
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background-color: #78acec;
+  color: #ffffff;
+} */

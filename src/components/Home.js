@@ -1,5 +1,6 @@
 import axios from "axios";
-import react, {useState, useEffect} from "react";
+import react, {useState, useEffect,useRef} from "react";
+import ReactDOM from 'react-dom';
 import Styled from 'styled-components';
 import { format, addDays } from 'date-fns';
 import { DateRangePicker } from 'react-date-range';
@@ -16,48 +17,58 @@ import Spinner from '../assets/spinner.gif';
 const HomeMain = Styled.div`
     display: flex;
     flex-wrap : wrap;
+    background-color: #fafafa;
+    //margin-top : 10px;
 `;
 const SidebarHome = Styled.div`
     padding:10px;
-    //border-right : 1px solid black;
-    flex: 1 1 15%;
+    margin : 5px 1%;
+    flex: 1 1 10%;
     min-width : 300px;
-    // height: 100vh;
-    // overflow-y: auto;
-    //text-align: center;
 `;
 
 const ChatArea = Styled.div`
-    flex: 1 1 60%;
+    margin : 5px 1%;
+    background-color:white;  
+    flex: 1 1 50%;
     padding: 0 2%;
-    height: 500px;
-    overflow-y: auto;
+    height: 80vh;
+    overflow-y: hidden;
+    :hover{
+        overflow: auto
+    }
+`;
+const ChatDiv = Styled.div`
+    width : 100%;
+    display:flex;
+    //flex-wrap:wrap;
+`;
+const DumyDiv = Styled.div`
+flex-shrink: 1;
+flex-grow: 1;
+//flex-basis:20%;
+min-width:250px;
 `;
 const ClientChat = Styled.div`
-text-align: right;
-background-color: #0174ff !important;
-color: white !important;
-font-family: Lato;
-font-size: 14px;
-Padding: 7px;
-margin: 14px;
-border-radius: 10px 10px 0 10px;
-box-shadow: 1px 1px 10px #fafafa;
-position: relative;
-left: 50%;
-width: 45%;
-
-
+ flex-shrink:1;
+align-item:right;
+ background-color: #0174ff !important;
+ color: white !important;
+ font-family: Lato;
+ border-radius: 10px 10px 0 10px;
+ font-size: 14px;
+ Padding: 2px 7px;
+ margin: 14px 0;
 `;
 const BotChat = Styled.div`
-    text-align: left;
-    background-color: #fafafa;
+     text-align: left;
+     align-item:left;
+     flex-shrink:1;
+    background-color: rgba(0, 0, 0, 0.05);
     font-size: 14px;
-    Padding: 7px;
+    Padding: 2px 7px;
     margin:10px 0px;
-    width: 45%;
     border-radius: 10px 10px 0 10px;
-    box-shadow: 1px 1px 10px #fafafa;
 `;
 
 const SearchInput = Styled.input`
@@ -78,11 +89,15 @@ margin: 5px 0px;
 border-radius : 5px;
 `;
 
-const DateAreaSpan = Styled.span`
+const DateAreaSpan = Styled.div`
+    background-color:white;
     padding: 7px 25px;
     border-radius: 5px;
-    box-shadow: 5px 5px 20px red inset;
     color: black;
+    font-size: 14px;
+    margin: 0px 0px 10px 0px;
+    backgroundColor: #ffffff;
+    color: #1b1b1b;
 `;
 
 
@@ -102,10 +117,10 @@ const Home = (props) =>{
    const [finalData, setFinalData] = useState([]);
    // setFilteredData({...filteredData});
     const [q, setQ] = useState('');
-
-
+    //const [idSelector, setIdSelector] = useState(null);
+    const ref = useRef(null);
     const [offset, setOffset] = useState(0);
-   // const [data, setData] = useState([]);
+   const [errOccur, setErrOccur] = useState(null);
     const [perPage] = useState(10);
     const [pageCount, setPageCount] = useState(20)
 
@@ -114,10 +129,12 @@ const Home = (props) =>{
     const [ hideShow, setHideShow] = useState(false);
     const [ typeShow, setTypeShow] = useState(true);
     const [ classAdd , setAclassAdd] = useState({
-        bgColorUser :"blue",
+        bgColorUser :"#0174ff",
         colorUser : 'white',
         bgColorSession : "",
-        colorSession : "black"
+        colorSession : "black",
+        clickBgColor : "",
+        clickColor : ""
     })
 
     const [ keyId,setKeyId] = useState('');
@@ -133,18 +150,23 @@ const Home = (props) =>{
     const HideAndShow = (k) =>{
          setHideShow(hideShow => !hideShow);
          setKeyId(k);
+        // chatHistory(k, '');
     }
+    // useEffect(()=>{
+    //     HideAndShow(keyId);
+    // }, [keyId])
 
     const [statusLoading, setStatusLoading] = useState('Loading');
     const [chatLoading, setChatLoading] = useState('Loading');
 
+    //const navRef = useRef(null);
 
     const handleClickUser=(key)=>{
         if( key === 'user'){
         setTypeShow(true);
         setAclassAdd({
             ...classAdd,
-            bgColorUser : "blue",
+            bgColorUser : "#0174ff",
             bgColorSession: "",
             colorSession: "",
             colorUser: "white"
@@ -155,7 +177,7 @@ const Home = (props) =>{
             setAclassAdd({
                 ...classAdd,
                 bgColorUser : "",
-                bgColorSession: "blue",
+                bgColorSession: "#0174ff",
                 colorSession: "white",
                 colorUser:""
             })
@@ -196,6 +218,7 @@ const Home = (props) =>{
             setStatusLoading('No data found...');
             setChatLoading('No data found...');
         }
+        //rawData[0].session_id
         else{
             chatHistory(rawData[0].user_id, rawData[0].session_id);
         }
@@ -203,6 +226,7 @@ const Home = (props) =>{
         catch(error){
             console.error(error);
             setStatusLoading('Error');
+            setErrOccur(error);
         }
       }
 
@@ -230,12 +254,38 @@ const Home = (props) =>{
  const dateFormater = (item) => {
          setDateState([item.selection]);
          setDateToggle(!dateToggle);
-    }
-
-
+    }       
 
 async function chatHistory(userIdSelected, sessionIdSelected) {   
-    //setStatusLoading('Loading');
+    const id = sessionIdSelected;
+    //console.log(id);
+   // if(idSelector === null){
+        // console.log('blank');
+        // console.log(idSelector);
+        // setIdSelector(id);
+        // console.log(idSelector);
+        // let element = document.getElementById(idSelector);
+        // console.log(element);
+        // ReactDOM.findDOMNode(element).classList.add("seleU") 
+    //     const p = ref.current; // corresponding DOM node
+    // p.className = "seleU";
+    //}
+    // else{
+        
+    //     let element = document.getElementById(idSelector);
+    //    // console.log('blank');
+    //    console.log(element);
+    //    console.log(idSelector);
+    //     ReactDOM.findDOMNode(element).classList.remove("selectedU");
+    //     console.log('blank');
+    //     setIdSelector(id);
+    //     element = document.getElementById(idSelector);
+    //     console.log(element);
+    //     console.log(idSelector);
+    //     ReactDOM.findDOMNode(element).classList.add("selectedU")
+    // }
+       
+
     setChatLoading('Loading');  
        const urlParamsHasUserId= userIdSelected!=""
         const urlParamsHasSessionId=sessionIdSelected!=""
@@ -314,7 +364,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     
                     </div>
                 </div>
-                <div>
+                <div style={{backgroundColor:"white",marginBottom:"20px", paddingBottom:"10px"}}>
                 <SearchInput 
                     type="search"
                     className="form-control rounded"
@@ -331,10 +381,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 onClick={() => handleClickUser('session')}>Session Id</HomeButton>
                 </div>
                 </div>
-                <div style={{
-                    maxHeight: "350px",
-                    overflowY: "auto"
-                }}>
+                <div className="scrollbar">
                     
                     {
                         (statusLoading === 'Loaded') &&
@@ -342,24 +389,11 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         return (
                             <>
                         <UserIdBox>
-                            <div key={k}
-                            style={{
-                                backgroundImage: "linear-gradient(red, yellow, green)",
-                                padding:"10px 0px",
-                                borderRadius: "5px",
-                                cursor:"pointer"
-                            }}
+                            <div key={k} className="userIdArea"
                              onClick={() => HideAndShow(k)}>{k}</div>
                             {
-                               (hideShow) && (keyId ===k) ?(filteredData[k].map( (item) => {
-                                    return <p 
-                                    style={{
-                                        border:"1px solid yellow",
-                                        padding: "5px",
-                                        boxShadow: "5px 5px 20px blue inset",
-                                        borderRadius: "5px",
-                                        cursor:"pointer"
-                                    }}
+                               (keyId ===k) ?(filteredData[k].map( (item) => {
+                                    return <p id={item.session_id} key={item.session_id} className="sessionIdArea"
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 })):(<></>)
@@ -369,38 +403,28 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         )
                     })
                 }
-                {
+                {/* {
                      (statusLoading === 'Loading')&&
-                     <p> <img style={{width:"50px"}} src={Spinner}/> Hang on..... Data is being..... </p>
-                }
+                     <p> <img style={{width:"50px"}} src={Spinner}/> Loading data... </p>
+                } */}
                 {
                     (statusLoading === 'Error') &&
-                    (<p>Please check your botId or date</p>)
+                    (<p>{errOccur}</p>)
                 }
                 {
                     (statusLoading === 'No data found...') &&
-                    (<p>No data found....</p>)
+                    (<p></p>)
                 }
                 </div>
-                <div style={{
-                    maxHeight: "350px",
-                    overflowY: "auto"
-                }}>
+                <div className="scrollbar">
                     {
-                     (!typeShow) && Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
+                     Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
                             <>
                         <UserIdBox>
                             {
-                               (filteredData[k].map( (item) => {
-                                    return <p 
-                                    style={{
-                                        border:"1px solid yellow",
-                                        padding: "5px",
-                                        boxShadow: "5px 5px 20px blue inset",
-                                        borderRadius: "5px",
-                                        cursor:"pointer"
-                                    }}
+                               (!typeShow) && (filteredData[k].map( (item) => {
+                                    return <p id={item.session_id} className="userIdArea" ref={ref}
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 }))
@@ -411,13 +435,14 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     })
                     }
                 </div>
-                <div style={{
-                    width:"100%",
-                    paddingLeftRight:"0px"
-                }}>
-                <ReactPaginate
-                    previousLabel={"prev"}
-                    nextLabel={"next"}
+                <div>
+                    {
+                (statusLoading==='Loaded') && 
+                (statusLoading!=='Loading') && 
+                (statusLoading !=='No data found...') && 
+                (pageCount !==0) && <ReactPaginate
+                    previousLabel={"<<"}
+                    nextLabel={">>"}
                     breakLabel={"..."}
                     breakClassName={"break-me"}
                     pageCount={pageCount}
@@ -427,7 +452,9 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     containerClassName={"pagination"}
                     subContainerClassName={"pages pagination"}
                     activeClassName={"active"}/>
+                }
                 </div>
+                
             </SidebarHome>
             <ChatArea>
         {
@@ -440,12 +467,13 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     var text1 = chatHistoryData[k].text;
                     return(
                         <>
+                        <ChatDiv>
+                        <DumyDiv></DumyDiv>
                         <ClientChat key={k}>   
-                        <div>
-                            <p style={{textAlign:"left"}}>{text1}</p>
-                            <p style={{textAlign:"right", fontSize:"10px"}}>{datetype}</p>
-                        </div>
+                            <p style={{textAlign:"left",padding:"0px",margin:"0px"}}>{text1}</p>
+                            <p style={{textAlign:"right", fontSize:"10px",padding:"0px",margin:"0px"}}>{datetype}</p>
                         </ClientChat>
+                        </ChatDiv>
                         </>
                     )
                 }
@@ -458,51 +486,50 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         <>
                         <div style={{
                         backgroundColor:"#0174ff",
+                        wordWrap: "break-word",
                         color:"white",
-                        padding:"2px 5px",
-                        borderRadius: "10px 10px 0 10px",
+                        padding:"2px 10px",
                         position:"relative",
                         textAlign:"left",
-                        width:"45%",
+                        width:"30%",
                         left:"50%"
                         }}>
-                        <p> {userIntent} :{(Math.round(userIntentConf * 100) / 100).toFixed(2)*100}%</p>
-                        <p>Status: {botCustomStatus}</p>
+                        <p style={{fontSize:"14px", padding:"0px",margin:"0px"}}>{userIntent} &nbsp; : &nbsp;{(Math.round(userIntentConf * 100) / 100).toFixed(2)*100}% &nbsp; &nbsp; &nbsp; , &nbsp;&nbsp;Status: {botCustomStatus}</p>
                         </div>
-                        <div>
                         {
                              Object.keys(botUtterdRes).map( (kk) =>{
                                 var text2 = botUtterdRes[kk].text;
-                                console.log(text2);
                                 var j =k+kk;
                                 return(
                                     <>
+                                    <ChatDiv>  
                                     <BotChat key={j}>
-                                        <p style={{textAlign:"left"}}>{text2}</p>
-                                    <p style={{textAlign:"right",fontSize:"10px"}}>{datetype}</p>
+                                    <p style={{textAlign:"left",padding:"0px",margin:"0px"}}>{text2}</p>
+                                    <p style={{textAlign:"right",fontSize:"10px",padding:"0px",margin:"0px"}}>{datetype}</p> 
                                     </BotChat>
+                                    <DumyDiv></DumyDiv>
+                                    </ChatDiv>
                                     </>
                                 )
                             })
                         }
-                        </div>
                         </>
                     )   
                 }   
-            })
+           })
          }
-         {
+          {
         (chatLoading === 'Loading')&&
-         <p> <img style={{width:"50px"}} src={Spinner}/> Hang on..... Data is being..... </p>
+         <p> <img style={{width:"50px"}} src={Spinner}/> Loading data... </p>
         }
         {
             (chatLoading === 'Error' || statusLoading ==='Error') &&
-            (<p>Please check your botId or date... Some error has occured</p>)
+            (<p>{errOccur}</p>)
         } 
         {
             (chatLoading === 'No data found...') &&
-            (<p>No data found....</p>)
-        }
+            (<p>No data found in bot</p>)
+         }
             </ChatArea>
         </HomeMain>
         </>
