@@ -13,32 +13,44 @@ function ConvertTime(originalDate){
     if (datetoday == datetype_now) {
     datetypone = datetype.slice(15, 21)
     var hour = datetype.slice(15, 18);
+        //hour = hour + 5;
     if (hour < 12) {
-    datetypone = datetypone + " am"
+    datetypone = datetypone + " AM"
     }
     else if (hour > 12) {
     hour = hour - 12;
     var minute = datetype.slice(18, 21);
-    datetypone = hour + minute + " pm"
+    // minute = minute + 30;
+    // if( minute >= 60 ){
+    //     minute = minute -60;
+    //     hour = hour + 1;
+    // }
+    datetypone = hour + minute + " PM"
     }
     else {
-    datetypone = datetypone + " pm"
+    datetypone = datetypone + " PM"
     }
     }
     else {
     datetypone = datetype.slice(0, 21)
     var hour = datetype.slice(15, 18);
+    //hour = hour + 5;
     if (hour < 12) {
-    datetypone = datetypone + " am"
+    datetypone = datetypone + " AM"
     }
     else if (hour > 12) {
     hour = hour - 12;
     var minute = datetype.slice(18, 21);
+    // minute = minute + 30;
+    // if( minute >= 60 ){
+    //     minute = minute -60;
+    //     hour = hour + 1;
+    // }
     var date_msg = datetype.slice(0, 15);
-    datetypone = date_msg + " " + hour + minute + " pm";
+    datetypone = date_msg + " " + hour + minute + " PM";
     }
     else {
-    datetypone = datetypone + " pm";
+    datetypone = datetypone + " PM";
     }
     }
     } else {

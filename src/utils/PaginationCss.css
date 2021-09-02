@@ -5,18 +5,23 @@
     outline: none;
   }
   .pagination > .active > a{
-    background-color: #47ccde ;
+    /* background-color: #47ccde ; */
+    background-color: #1b1b1b ;
     /* border-color: #47ccde ; */
     color: #fff;
   }
   .pagination > li > a{
-    border: 1px solid #47ccde ;
+    /* border: 1px solid #47ccde ; */
+    border-radius: 100%;
     padding: 5px 5px;
+    font-size: 14px;
+    margin: 2px;
     outline: none;
     cursor: pointer;
   }
   .pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus{
-    background-color: #47ccde ;
+    /* background-color: #47ccde ; */
+    background-color: #1b1b1b ;
     border-color: #47ccde;
     outline: none ;
   }
@@ -36,11 +41,15 @@
     color: #ffffff;
     }
   
-.scrollbar{
-      max-height: 350px; 
+.myscrollbar{
+      max-height: 300px; 
     overflow-y: hidden;
 }
-.scrollbar:hover{
+/* .myscrollbar::-webkit-scrollbar {
+  width: 5px;
+  visibility: hidden;
+} */
+.myscrollbar:hover{
   overflow-y: auto;
 }
 
@@ -70,8 +79,10 @@
   padding: 7px 0px;
   width: 100%;
   border-radius: 7px;
-  background-color: #ffffff;
-  color: #1b1b1b;
+  /* background-color: #ffffff;
+  color: #1b1b1b; */
+  background-color: rgba(1,116,255,0.6);
+  color: #ffffff;
   box-shadow: 1px 7px 5px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 import react, {useState, useEffect,useRef} from "react";
 import ReactDOM from 'react-dom';
 import Styled from 'styled-components';
-import { format, addDays } from 'date-fns';
+import { format, addDays, daysInWeek } from 'date-fns';
 import { DateRangePicker } from 'react-date-range';
 import ReactPaginate from 'react-paginate';
 
@@ -35,7 +35,8 @@ const ChatArea = Styled.div`
     height: 80vh;
     overflow-y: hidden;
     :hover{
-        overflow: auto
+        overflow: auto;
+
     }
 `;
 const ChatDiv = Styled.div`
@@ -57,7 +58,7 @@ align-item:right;
  font-family: Lato;
  border-radius: 10px 10px 0 10px;
  font-size: 14px;
- Padding: 2px 7px;
+ Padding: 10px 7px;
  margin: 14px 0;
 `;
 const BotChat = Styled.div`
@@ -66,7 +67,7 @@ const BotChat = Styled.div`
      flex-shrink:1;
     background-color: rgba(0, 0, 0, 0.05);
     font-size: 14px;
-    Padding: 2px 7px;
+    Padding: 10px 7px;
     margin:10px 0px;
     border-radius: 10px 10px 0 10px;
 `;
@@ -75,13 +76,16 @@ const SearchInput = Styled.input`
     width: 90%;
     padding: 7px;
     border-radius: 10px;
-    margin-top : 20px;
-    margin-bottom: 5px;
+    margin-top : 10px;
+    margin-bottom: 10px;
+    //border:none;
+    outline: none;
 `;
 const HomeButton = Styled.button`
     padding 5px;
     border-radius:5px;
-    margin: 0 5px
+    margin: 0 5px;
+    outline: none;
 `;
 const UserIdBox = Styled.div`
 height : auto;
@@ -109,7 +113,9 @@ const BaseURL = "https://backend.saarthi.ai";
 //const queryUrl = "https://backend.saarthi.ai/humanHandoff/getUserHistory?userId=6009698071"
 
 var queryUrlBase = "http://dashboard.saarthi.ai/Query 62/stream?format=json&token=shhh&params=";
-
+var cnt =[];
+var flagDate = true;
+var chatDateType = Date(new Date());
 const Home = (props) =>{
     const [sessionList,setSessionList] = useState([]);
     const [groupById , setGroupById] = useState({});
@@ -117,6 +123,7 @@ const Home = (props) =>{
    const [finalData, setFinalData] = useState([]);
    // setFilteredData({...filteredData});
     const [q, setQ] = useState('');
+   // const cnt = 0;
     //const [idSelector, setIdSelector] = useState(null);
     const ref = useRef(null);
     const [offset, setOffset] = useState(0);
@@ -125,7 +132,7 @@ const Home = (props) =>{
     const [pageCount, setPageCount] = useState(20)
 
     const [chatHistoryData,setChatHistoryData] = useState({});
-    var cnt =0;
+   // const [chatDateType , setChatDateType] = useState(new Date());
     const [ hideShow, setHideShow] = useState(false);
     const [ typeShow, setTypeShow] = useState(true);
     const [ classAdd , setAclassAdd] = useState({
@@ -159,7 +166,6 @@ const Home = (props) =>{
     const [statusLoading, setStatusLoading] = useState('Loading');
     const [chatLoading, setChatLoading] = useState('Loading');
 
-    //const navRef = useRef(null);
 
     const handleClickUser=(key)=>{
         if( key === 'user'){
@@ -202,16 +208,22 @@ const Home = (props) =>{
         try{
             const res = await axios.get(queryUrl)
             const rawData = res.data;
-            const usersByDay = {};           
+            const usersByDay = {}; 
+            //var j = 0          
         for (var i = 0; i < rawData.length; i++) {
             var item = rawData[i];
+            //(usersByDay[item.user_id])
             (usersByDay[item.user_id] || (usersByDay[item.user_id] = [])).push(item);
-        }             
+
+        } 
+       // console.log()      
         setGroupById(usersByDay);
         setFilteredData(usersByDay);
+        var j = 1;
         const jai = usersByDay && Object.keys(usersByDay).map( k => {
             return k;
         });
+        cnt = [...jai];
         setPageCount(Math.ceil(jai.length / perPage));
         setStatusLoading('Loaded');
         if( rawData.length ===0){
@@ -226,10 +238,10 @@ const Home = (props) =>{
         catch(error){
             console.error(error);
             setStatusLoading('Error');
-            setErrOccur(error);
+            setErrOccur(error.data);
         }
       }
-
+      //window.addEventListener('scroll', this.handleScroll, true);
       const filtered = (e) => {
         const filtered =
           groupById &&
@@ -381,16 +393,17 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 onClick={() => handleClickUser('session')}>Session Id</HomeButton>
                 </div>
                 </div>
-                <div className="scrollbar">
+                <div className="myscrollbar">
                     
                     {
                         (statusLoading === 'Loaded') &&
-                     (typeShow) &&  Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
+                     (typeShow) &&  Object.keys(filteredData).slice(offset,offset + perPage).map((k) => {
                         return (
                             <>
                         <UserIdBox>
+                        {/* <p style={{textAlign:"left",margin:"0px", padding:"0px", paddingLeft:"10px"}}> */}
                             <div key={k} className="userIdArea"
-                             onClick={() => HideAndShow(k)}>{k}</div>
+                             onClick={() => HideAndShow(k)}>{cnt.indexOf(k)+1}. &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;{k}</div>
                             {
                                (keyId ===k) ?(filteredData[k].map( (item) => {
                                     return <p id={item.session_id} key={item.session_id} className="sessionIdArea"
@@ -416,7 +429,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                     (<p></p>)
                 }
                 </div>
-                <div className="scrollbar">
+                <div className="myscrollbar">
                     {
                      Object.keys(filteredData).slice(offset,offset + perPage).map(k => {
                         return (
@@ -424,7 +437,7 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         <UserIdBox>
                             {
                                (!typeShow) && (filteredData[k].map( (item) => {
-                                    return <p id={item.session_id} className="userIdArea" ref={ref}
+                                    return <p id={item.session_id} className="sessionIdArea" ref={ref}
                                     onClick={() => chatHistory(k,item.session_id)}
                                     >{item.session_id}</p>
                                 }))
@@ -457,12 +470,14 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                 
             </SidebarHome>
             <ChatArea>
+            <p>{chatDateType.toString().substring(0,15)}</p>
         {
            (chatLoading === 'Loaded') && Object.keys(chatHistoryData).map( (k) =>{
                 const messageType = chatHistoryData[k].msg_type;
                 var datetype = new Date(chatHistoryData[k].created_at) || "";
-              
                 datetype = ConvertTime(datetype);
+                chatDateType = datetype;
+                datetype = datetype.slice(15,24);
                 if(messageType === 0){
                     var text1 = chatHistoryData[k].text;
                     return(
@@ -484,18 +499,19 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                    const botCustomStatus = chatHistoryData[k].text.custom.status;
                     return(
                         <>
+                        <ChatDiv>
+                        <DumyDiv></DumyDiv>
                         <div style={{
-                        backgroundColor:"#0174ff",
+                        // backgroundColor:"#0174ff",
+                        backgroundColor:"rgba(1,116,255,0.7)",
+                        borderRadius: "5px 5px 0 5px",
                         wordWrap: "break-word",
                         color:"white",
-                        padding:"2px 10px",
-                        position:"relative",
-                        textAlign:"left",
-                        width:"30%",
-                        left:"50%"
+                        padding:"5px 10px"
                         }}>
-                        <p style={{fontSize:"14px", padding:"0px",margin:"0px"}}>{userIntent} &nbsp; : &nbsp;{(Math.round(userIntentConf * 100) / 100).toFixed(2)*100}% &nbsp; &nbsp; &nbsp; , &nbsp;&nbsp;Status: {botCustomStatus}</p>
+                        <p style={{fontSize:"10px", padding:"0px",margin:"0px"}}>{userIntent}: &nbsp;{(Math.round(userIntentConf * 100) / 100).toFixed(2)*100}%,&nbsp;Status: {botCustomStatus}</p>
                         </div>
+                        </ChatDiv>
                         {
                              Object.keys(botUtterdRes).map( (kk) =>{
                                 var text2 = botUtterdRes[kk].text;

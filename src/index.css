@@ -5,12 +5,14 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* overflow-y:hidden; */
+  overflow-y:hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 0.5em;
+  width: 5px;
+  /* visibility: hidden; */
 }
+
 
 /* Track */
 ::-webkit-scrollbar-track {
@@ -23,8 +25,9 @@ body {
 }
 
 /* Handle on hover */
-/* ::-webkit-scrollbar-thumb:hover {
+/* ::-webkit-scrollbar-thumb:hover{
   background: #555;
+  display: block;
 } */
 
 
