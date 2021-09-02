@@ -401,9 +401,15 @@ const arr = [1,2,3,4,5,6,7,8,9,2,4,5,6,7,8,9,1,2,3,4,5];
                         return (
                             <>
                         <UserIdBox>
+                        {/* {cnt.indexOf(k)+1}. &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;{k} */}
                         {/* <p style={{textAlign:"left",margin:"0px", padding:"0px", paddingLeft:"10px"}}> */}
                             <div key={k} className="userIdArea"
-                             onClick={() => HideAndShow(k)}>{cnt.indexOf(k)+1}. &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;{k}</div>
+                             onClick={() => HideAndShow(k)} 
+                             style={{textAlign:"left", paddingLeft:"14px"}}>
+                                 {/* <p style={{padding:"0px", margin:"0px",textAlign:"left",paddingLeft:"10px"}}>{cnt.indexOf(k)+1}. </p>
+                                 <p style={{padding:"0px", margin:"0px",}}>{k}</p> */}
+                                 {cnt.indexOf(k)+1}. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;{k}
+                                 </div>
                             {
                                (keyId ===k) ?(filteredData[k].map( (item) => {
                                     return <p id={item.session_id} key={item.session_id} className="sessionIdArea"
